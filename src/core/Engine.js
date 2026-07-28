@@ -6,8 +6,8 @@
  *
  * Controls one living mechanical Engine.
  *
- * DNA creates the identity.
- * Gears, reactor and rings follow the DNA.
+ * DNA creates identity.
+ * Every system follows the DNA.
  * ===========================================================
  */
 
@@ -27,22 +27,19 @@ import PlasmaArc from "../objects/PlasmaArc.js";
 export default class Engine {
 
 
-
     constructor(p){
 
 
         this.p = p;
 
 
-
-        // CREATE DNA
+        // DNA
 
         this.dna = new DNA();
 
 
 
-
-        // CREATE MATERIAL
+        // MATERIAL
 
         this.material =
             new Materials(
@@ -51,14 +48,11 @@ export default class Engine {
 
 
 
-
         this.rotation = 0;
 
 
 
-
-        // CREATE REACTOR
-
+        // REACTOR
 
         this.reactor =
             new Reactor(
@@ -66,15 +60,25 @@ export default class Engine {
                 this.dna,
                 this.material
             );
-        // CREATE CONTAINMENT NODES
+
+
+
+        // NODES
 
         this.nodes = [];
 
         const nodeCount = 6;
 
-        for (let i = 0; i < nodeCount; i++) {
 
-            const angle = (360 / nodeCount) * i;
+        for(
+            let i = 0;
+            i < nodeCount;
+            i++
+        ){
+
+            const angle =
+                (360 / nodeCount) * i;
+
 
             this.nodes.push(
 
@@ -95,23 +99,25 @@ export default class Engine {
             );
 
         }
-        // CREATE PLASMA ARC
 
-        this.plasma = new PlasmaArc(
-            p,
-            this.material
-        );
+
+
+        // PLASMA
+
+        this.plasma =
+            new PlasmaArc(
+                p,
+                this.material
+            );
+
 
         this.arcTimer = 0;
 
 
 
-
-        // CREATE ENERGY RINGS
-
+        // RINGS
 
         this.rings = [];
-
 
 
         for(
@@ -120,20 +126,15 @@ export default class Engine {
             i++
         ){
 
-
             this.rings.push(
 
                 new Ring(
 
                     p,
 
-                    this.dna.outerRadius
-                    -
-                    i * 35,
+                    this.dna.outerRadius - i * 35,
 
-
-                    this.dna.rotationSpeed
-                    *
+                    this.dna.rotationSpeed *
                     (
                         i % 2 === 0
                             ? 1
@@ -143,37 +144,41 @@ export default class Engine {
                 )
 
             );
-            // CREATE ENERGY PARTICLES
-
-            this.particles = [];
-
-            for (let i = 0; i < 120; i++) {
-
-                this.particles.push(
-
-                    new Particle(
-                        p,
-                        this.dna,
-                        this.material
-                    )
-
-                );
-
-            }
-
 
         }
 
 
 
 
+        // PARTICLES
+
+        this.particles = [];
 
 
-        // CREATE GEARS
+        for(
+            let i = 0;
+            i < 120;
+            i++
+        ){
 
+            this.particles.push(
+
+                new Particle(
+                    p,
+                    this.dna,
+                    this.material
+                )
+
+            );
+
+        }
+
+
+
+
+        // GEARS
 
         this.gears = [];
-
 
 
         for(
@@ -183,50 +188,31 @@ export default class Engine {
         ){
 
 
-
             const angle =
-                (
-                    360
-                    /
-                    this.dna.gears
-                )
-                *
-                i;
-
+                (360 / this.dna.gears) * i;
 
 
 
             this.gears.push(
 
-
                 new Gear(
 
                     p,
 
-
                     this.dna.gearSize,
 
-
-
-                    this.dna.rotationSpeed
-                    *
+                    this.dna.rotationSpeed *
                     (
                         i % 2 === 0
                             ? 1
                             : -1
                     ),
 
-
-
                     angle,
-
-
 
                     this.dna.gearDistance
 
-
                 )
-
 
             );
 
@@ -234,11 +220,7 @@ export default class Engine {
         }
 
 
-
     }
-
-
-
 
 
 
@@ -252,6 +234,9 @@ export default class Engine {
 
 
         this.reactor.update();
+
+
+
         this.nodes.forEach(
             node => node.update()
         );
@@ -259,29 +244,87 @@ export default class Engine {
 
 
         this.rings.forEach(
-
-            ring =>
-                ring.update()
-
+            ring => ring.update()
         );
 
 
 
         this.gears.forEach(
-
             gear => gear.update()
-
         );
+
+
+
         this.particles.forEach(
             particle => particle.update()
         );
 
 
+
+        // PLASMA EVENT
+
+        this.plasma.update();
+
+
+        this.arcTimer++;
+
+
+        if(
+            this.arcTimer > 45 &&
+            !this.plasma.active()
+        ){
+
+
+            let start =
+                this.nodes[
+                    Math.floor(
+                        Math.random()
+                        *
+                        this.nodes.length
+                    )
+                    ];
+
+
+            let end =
+                this.nodes[
+                    Math.floor(
+                        Math.random()
+                        *
+                        this.nodes.length
+                    )
+                    ];
+
+
+
+            while(end === start){
+
+                end =
+                    this.nodes[
+                        Math.floor(
+                            Math.random()
+                            *
+                            this.nodes.length
+                        )
+                        ];
+
+            }
+
+
+
+            this.plasma.connect(
+                start,
+                end
+            );
+
+
+            this.arcTimer = 0;
+
+
+        }
+
+
+
     }
-
-
-
-
 
 
 
@@ -299,7 +342,6 @@ export default class Engine {
 
 
 
-
         p.translate(
 
             p.width / 2,
@@ -310,35 +352,47 @@ export default class Engine {
 
 
 
-
-        // ENERGY RINGS
+        // RINGS
 
         this.rings.forEach(
             ring => ring.draw()
         );
 
 
-// GEARS
+
+        // GEARS
 
         this.gears.forEach(
             gear => gear.draw()
         );
 
 
-// ENERGY PARTICLES
+
+        // PARTICLES
 
         this.particles.forEach(
             particle => particle.draw()
         );
 
 
-// REACTOR
+
+        // NODES
+
         this.nodes.forEach(
             node => node.draw()
         );
 
-        this.reactor.draw();
 
+
+        // PLASMA
+
+        this.plasma.draw();
+
+
+
+        // REACTOR
+
+        this.reactor.draw();
 
 
 
@@ -346,7 +400,6 @@ export default class Engine {
 
 
     }
-
 
 
 }
