@@ -5,121 +5,319 @@
  * Particle.js
  *
  * Living energy particle.
+ *
+ * Reacts to:
+ * DNA
+ * Material
+ * Rarity
  * ===========================================================
  */
 
+
 export default class Particle {
 
-    constructor(p, dna, material){
+
+
+    constructor(
+        p,
+        dna,
+        material
+    ){
+
 
         this.p = p;
+
+
         this.dna = dna;
+
+
         this.material = material;
+
 
         this.reset();
 
+
     }
+
+
+
+
 
     reset(){
 
+
         const p = this.p;
 
-        // Random position around the core
 
-        this.angle = p.random(360);
 
-        // Start close to the reactor
+        this.angle =
+            p.random(360);
+
+
 
         this.radius =
+
             p.random(
+
                 this.dna.coreSize * 0.8,
+
                 this.dna.outerRadius * 0.35
+
             );
 
-        // Orbit speed
+
+
+
+
+        const materialPower =
+
+            this.material.properties.energy || 1;
+
+
 
         this.orbitSpeed =
-            p.random(0.15,0.5);
 
-        // Floating movement
+            p.random(
+                0.15,
+                0.5
+            )
+            *
+            materialPower;
+
+
+
+
 
         this.wave =
+
             p.random(1000);
 
-        this.waveSpeed =
-            p.random(0.01,0.04);
 
-        // Particle size
+
+
+
+        this.waveSpeed =
+
+            p.random(
+                0.01,
+                0.04
+            )
+            *
+            materialPower;
+
+
+
+
 
         this.size =
-            p.random(2,6);
+
+            p.random(
+                2,
+                6
+            )
+            *
+            materialPower;
+
+
+
+
+
+        const rarityMultiplier =
+
+
+            this.dna.rarity === "Legendary"
+                ? 1.5
+                :
+                this.dna.rarity === "Epic"
+                    ? 1.25
+                    :
+                    1;
+
+
+
+
 
         this.life =
-            p.random(150,255);
+
+            p.random(
+                150,
+                255
+            )
+            *
+            rarityMultiplier;
+
+
+
+
 
         this.fade =
-            p.random(0.3,1);
+
+            p.random(
+                0.3,
+                1
+            );
+
+
 
     }
+
+
+
+
 
     update(){
 
-        this.angle += this.orbitSpeed;
 
-        this.wave += this.waveSpeed;
 
-        this.life -= this.fade;
+        this.angle +=
+            this.orbitSpeed;
+
+
+
+        this.wave +=
+            this.waveSpeed;
+
+
+
+        this.life -=
+            this.fade;
+
+
+
 
         if(this.life <= 30){
 
+
             this.reset();
+
 
         }
 
+
     }
+
+
+
+
 
     draw(){
 
-        const p = this.p;
+
+        const p =
+            this.p;
+
+
 
         p.push();
 
-        p.rotate(this.angle);
+
+
+
+        p.rotate(
+            this.angle
+        );
+
+
+
 
         const offset =
-            Math.sin(this.wave) * 8;
+
+            Math.sin(
+                this.wave
+            )
+            *
+            8;
+
+
+
+
 
         p.translate(
+
             this.radius + offset,
+
             0
+
         );
+
+
+
+
 
         p.noStroke();
 
-        // Soft glow
 
-        p.drawingContext.shadowBlur = 18;
+
+
+
+        const energyPulse =
+
+            1 +
+            Math.sin(
+                this.wave
+            )
+            *
+            0.2;
+
+
+
+
+
+        p.drawingContext.shadowBlur =
+
+
+            18
+            *
+            this.material.properties.intensity;
+
+
+
+
 
         p.drawingContext.shadowColor =
+
             this.material.properties.glow;
 
-        const glow =
-            this.material.properties.glow;
+
+
+
 
         p.fill(
-            glow + Math.floor(this.life).toString(16).padStart(2,"0")
+
+            this.material.properties.glow
+
         );
 
+
+
+
+
         p.circle(
+
             0,
+
             0,
+
             this.size
+            *
+            energyPulse
+
         );
+
+
+
+
 
         p.drawingContext.shadowBlur = 0;
 
+
+
         p.pop();
 
+
+
     }
+
+
 
 }
