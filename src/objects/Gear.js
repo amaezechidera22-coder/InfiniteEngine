@@ -6,11 +6,10 @@
  *
  * Mechanical gear component.
  *
- * Each gear has:
- * - position
- * - rotation speed
- * - teeth
- * - mechanical movement
+ * Controlled by:
+ * DNA
+ * Material
+ * Energy system
  * ===========================================================
  */
 
@@ -18,12 +17,15 @@
 export default class Gear {
 
 
+
     constructor(
         p,
         radius,
         speed,
         angle,
-        distance
+        distance,
+        material = null,
+        dna = null
     ){
 
 
@@ -42,6 +44,12 @@ export default class Gear {
         this.distance = distance;
 
 
+        this.material = material;
+
+
+        this.dna = dna;
+
+
 
         this.rotation = 0;
 
@@ -55,6 +63,27 @@ export default class Gear {
 
 
 
+        if(this.dna){
+
+
+            this.teeth +=
+
+                Math.floor(
+
+                    this.dna.gears / 2
+
+                );
+
+
+        }
+
+
+
+        this.offset =
+            p.random(1000);
+
+
+
     }
 
 
@@ -64,18 +93,23 @@ export default class Gear {
     update(){
 
 
-        // Orbit movement
 
         this.orbitAngle +=
-            this.speed * 0.002;
+
+            this.speed
+            *
+            0.002;
 
 
 
-
-        // Actual gear rotation
 
         this.rotation +=
+
             this.speed;
+
+
+
+        this.offset += 0.03;
 
 
 
@@ -100,11 +134,13 @@ export default class Gear {
 
 
 
-        // Move to gear position
 
         p.rotate(
+
             this.orbitAngle
+
         );
+
 
 
 
@@ -120,8 +156,6 @@ export default class Gear {
 
 
 
-        // Rotate gear itself
-
         p.rotate(
 
             this.rotation
@@ -133,16 +167,73 @@ export default class Gear {
 
 
 
-        // METAL BODY
+        const materialColor =
+
+            this.material
+
+                ?
+
+                this.material.properties.primary
+
+                :
+
+                "#b8c6d1";
+
+
+
+
+
+        const glowColor =
+
+            this.material
+
+                ?
+
+                this.material.properties.glow
+
+                :
+
+                "#4fdcff";
+
+
+
+
+
+
+        // ENERGY GLOW
+
+
+        if(this.material){
+
+
+            p.drawingContext.shadowBlur =
+
+                15 *
+                this.material.properties.intensity;
+
+
+
+            p.drawingContext.shadowColor =
+
+                glowColor;
+
+
+        }
+
+
+
+
+
+
+
+        // GEAR BODY
 
 
         p.noFill();
 
 
         p.stroke(
-            180,
-            200,
-            220
+            materialColor
         );
 
 
@@ -167,7 +258,7 @@ export default class Gear {
 
 
 
-        // INNER CORE HOLE
+        // INNER CORE
 
 
         p.strokeWeight(2);
@@ -193,20 +284,31 @@ export default class Gear {
 
 
         for(
+
             let i = 0;
+
             i < this.teeth;
+
             i++
+
         ){
 
 
 
             const angle =
+
                 (
+
                     Math.PI * 2
+
                     /
+
                     this.teeth
+
                 )
+
                 *
+
                 i;
 
 
@@ -214,12 +316,15 @@ export default class Gear {
 
 
             const inner =
+
                 this.radius * 0.5;
 
 
 
 
+
             const outer =
+
                 this.radius * 0.65;
 
 
@@ -227,30 +332,45 @@ export default class Gear {
 
 
             const x1 =
+
                 Math.cos(angle)
+
                 *
+
                 inner;
+
 
 
 
             const y1 =
+
                 Math.sin(angle)
+
                 *
+
                 inner;
+
 
 
 
 
             const x2 =
+
                 Math.cos(angle)
+
                 *
+
                 outer;
 
 
 
+
             const y2 =
+
                 Math.sin(angle)
+
                 *
+
                 outer;
 
 
@@ -277,11 +397,16 @@ export default class Gear {
 
 
 
+        p.drawingContext.shadowBlur = 0;
+
+
 
         p.pop();
 
 
+
     }
+
 
 
 }
