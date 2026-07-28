@@ -11,39 +11,58 @@
  * ===========================================================
  */
 
+
 export default class DNA {
 
 
-    constructor(seed = Math.floor(Math.random() * 1000000000)) {
+    constructor(
+        seed = Math.floor(
+            Math.random() * 1000000000
+        )
+    ){
 
 
         this.seed = seed;
 
 
-        this.random = this.createRandom(seed);
+        this.random =
+            this.createRandom(seed);
+
+
+
+        // IDENTITY
+
+        this.id =
+            "ENGINE-" +
+            seed;
 
 
 
         // CORE SYSTEM
 
+
         this.coreSize =
-            this.range(30, 45);
+            this.range(30,45);
 
 
 
         this.outerRadius =
-            this.range(160, 190);
+            this.range(160,190);
 
 
 
         this.rotationSpeed =
-            this.range(0.2, 0.8);
+            this.range(0.2,0.8);
 
 
 
         this.energyStrength =
-            this.range(0.8, 1.5);
+            this.range(0.8,1.5);
 
+
+
+        this.reactorPower =
+            this.range(1,10);
 
 
 
@@ -51,22 +70,40 @@ export default class DNA {
 
 
         this.gears =
-            this.integer(5, 9);
+            this.integer(5,9);
 
 
 
         this.gearSize =
-            this.range(25, 45);
+            this.range(25,45);
 
 
 
         this.rings =
-            this.integer(2, 4);
+            this.integer(2,4);
 
 
 
         this.gearDistance =
-            this.range(65, 100);
+            this.range(65,100);
+
+
+
+        // PARTICLE SYSTEM
+
+
+        this.particleCount =
+            this.integer(80,180);
+
+
+
+        this.plasmaFrequency =
+            this.range(20,80);
+
+
+
+        this.glow =
+            this.range(10,30);
 
 
 
@@ -101,7 +138,58 @@ export default class DNA {
             this.calculateRarity();
 
 
+
+        this.applyRarityBoost();
+
+
+
     }
+
+
+
+
+
+    applyRarityBoost(){
+
+
+        if(this.rarity === "Legendary"){
+
+
+            this.energyStrength *= 1.5;
+
+            this.reactorPower *= 1.5;
+
+            this.material =
+                "Quantum Alloy";
+
+
+        }
+
+
+
+        if(this.rarity === "Epic"){
+
+
+            this.energyStrength *= 1.25;
+
+            this.reactorPower *= 1.25;
+
+
+        }
+
+
+
+        if(this.rarity === "Rare"){
+
+
+            this.energyStrength *= 1.1;
+
+
+        }
+
+
+    }
+
 
 
 
@@ -112,12 +200,17 @@ export default class DNA {
         let value = seed;
 
 
-        return () => {
+        return ()=>{
 
 
             value =
-                (value * 1664525 + 1013904223)
-                % 4294967296;
+                (
+                    value *
+                    1664525 +
+                    1013904223
+                )
+                %
+                4294967296;
 
 
 
@@ -132,16 +225,20 @@ export default class DNA {
 
 
 
+
     range(min,max){
 
 
         return min +
-            (max - min)
+            (
+                max-min
+            )
             *
             this.random();
 
 
     }
+
 
 
 
@@ -160,6 +257,7 @@ export default class DNA {
 
 
     }
+
 
 
 
@@ -195,16 +293,19 @@ export default class DNA {
 
 
         if(value < 0.01)
+
             return "Legendary";
 
 
 
         if(value < 0.05)
+
             return "Epic";
 
 
 
         if(value < 0.20)
+
             return "Rare";
 
 
