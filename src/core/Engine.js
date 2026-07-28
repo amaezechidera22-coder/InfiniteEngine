@@ -19,6 +19,8 @@ import Gear from "../objects/Gear.js";
 import Reactor from "../objects/Reactor.js";
 import Ring from "../objects/Ring.js";
 import Particle from "../objects/Particle.js";
+import Node from "../objects/Node.js";
+import PlasmaArc from "../objects/PlasmaArc.js";
 
 
 
@@ -64,6 +66,43 @@ export default class Engine {
                 this.dna,
                 this.material
             );
+        // CREATE CONTAINMENT NODES
+
+        this.nodes = [];
+
+        const nodeCount = 6;
+
+        for (let i = 0; i < nodeCount; i++) {
+
+            const angle = (360 / nodeCount) * i;
+
+            this.nodes.push(
+
+                new Node(
+
+                    p,
+
+                    angle,
+
+                    this.dna.outerRadius * 0.55,
+
+                    this.dna,
+
+                    this.material
+
+                )
+
+            );
+
+        }
+        // CREATE PLASMA ARC
+
+        this.plasma = new PlasmaArc(
+            p,
+            this.material
+        );
+
+        this.arcTimer = 0;
 
 
 
@@ -213,6 +252,9 @@ export default class Engine {
 
 
         this.reactor.update();
+        this.nodes.forEach(
+            node => node.update()
+        );
 
 
 
@@ -291,6 +333,9 @@ export default class Engine {
 
 
 // REACTOR
+        this.nodes.forEach(
+            node => node.draw()
+        );
 
         this.reactor.draw();
 
