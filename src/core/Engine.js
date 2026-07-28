@@ -1,54 +1,136 @@
 /**
- * ===========================================
+ * ===========================================================
  * THE INFINITE ENGINE
+ *
  * Engine.js
  *
- * Represents one Engine.
- * ===========================================
+ * Controls one living mechanical Engine.
+ *
+ * DNA creates the identity.
+ * Gears, reactor and rings follow the DNA.
+ * ===========================================================
  */
 
 
-import Gear from "../objects/Gear.js";
-import Materials from "../materials/Materials.js";
 import DNA from "../dna/DNA.js";
+import Materials from "../materials/Materials.js";
+
+import Gear from "../objects/Gear.js";
 import Reactor from "../objects/Reactor.js";
+import Ring from "../objects/Ring.js";
+import Particle from "../objects/Particle.js";
+
 
 
 export default class Engine {
 
 
-    constructor(p) {
+
+    constructor(p){
 
 
         this.p = p;
 
 
-        this.rotation = 0;
 
+        // CREATE DNA
 
         this.dna = new DNA();
 
 
-        this.material = new Materials(
-            this.dna.material
-        );
 
 
-        this.outerRadius =
-            this.dna.outerRadius;
+        // CREATE MATERIAL
 
-
-        this.coreRadius =
-            this.dna.coreSize;
+        this.material =
+            new Materials(
+                this.dna.material
+            );
 
 
 
-        this.reactor = new Reactor(
-            p,
-            this.dna,
-            this.material
-        );
 
+        this.rotation = 0;
+
+
+
+
+        // CREATE REACTOR
+
+
+        this.reactor =
+            new Reactor(
+                p,
+                this.dna,
+                this.material
+            );
+
+
+
+
+        // CREATE ENERGY RINGS
+
+
+        this.rings = [];
+
+
+
+        for(
+            let i = 0;
+            i < this.dna.rings;
+            i++
+        ){
+
+
+            this.rings.push(
+
+                new Ring(
+
+                    p,
+
+                    this.dna.outerRadius
+                    -
+                    i * 35,
+
+
+                    this.dna.rotationSpeed
+                    *
+                    (
+                        i % 2 === 0
+                            ? 1
+                            : -1
+                    )
+
+                )
+
+            );
+            // CREATE ENERGY PARTICLES
+
+            this.particles = [];
+
+            for (let i = 0; i < 120; i++) {
+
+                this.particles.push(
+
+                    new Particle(
+                        p,
+                        this.dna,
+                        this.material
+                    )
+
+                );
+
+            }
+
+
+        }
+
+
+
+
+
+
+        // CREATE GEARS
 
 
         this.gears = [];
@@ -61,54 +143,64 @@ export default class Engine {
             i++
         ){
 
+
+
+            const angle =
+                (
+                    360
+                    /
+                    this.dna.gears
+                )
+                *
+                i;
+
+
+
+
             this.gears.push(
+
 
                 new Gear(
 
                     p,
 
 
-                    this.dna.gearSize *
-                    (0.5 + Math.random()),
+                    this.dna.gearSize,
 
 
 
+                    this.dna.rotationSpeed
+                    *
                     (
-                        this.dna.rotationSpeed *
-                        (
-                            Math.random() > 0.5
-                                ? 1
-                                : -1
-                        )
-                    )
-                    +
-                    (
-                        Math.random() * 0.5
+                        i % 2 === 0
+                            ? 1
+                            : -1
                     ),
 
 
 
-                    Math.random()
-                    *
-                    Math.PI
-                    *
-                    2,
+                    angle,
 
 
 
-                    60 +
-                    Math.random()
-                    *
-                    90
+                    this.dna.gearDistance
+
 
                 )
 
+
             );
+
 
         }
 
 
+
     }
+
+
+
+
 
 
 
@@ -124,12 +216,31 @@ export default class Engine {
 
 
 
+        this.rings.forEach(
+
+            ring =>
+                ring.update()
+
+        );
+
+
+
         this.gears.forEach(
+
             gear => gear.update()
+
+        );
+        this.particles.forEach(
+            particle => particle.update()
         );
 
 
     }
+
+
+
+
+
 
 
 
@@ -137,56 +248,52 @@ export default class Engine {
     draw(){
 
 
-        const p = this.p;
+        const p =
+            this.p;
+
 
 
         p.push();
 
 
 
+
         p.translate(
+
             p.width / 2,
+
             p.height / 2
+
         );
 
 
 
-        p.rotate(
-            this.rotation
+
+        // ENERGY RINGS
+
+        this.rings.forEach(
+            ring => ring.draw()
         );
 
 
-
-        // Outer Ring
-
-        p.noFill();
-
-
-        p.stroke(220);
-
-
-        p.strokeWeight(4);
-
-
-        p.circle(
-            0,
-            0,
-            this.outerRadius * 2
-        );
-
-
-
-        // Draw gears first
+// GEARS
 
         this.gears.forEach(
             gear => gear.draw()
         );
 
 
+// ENERGY PARTICLES
 
-        // Draw reactor on top
+        this.particles.forEach(
+            particle => particle.draw()
+        );
+
+
+// REACTOR
 
         this.reactor.draw();
+
 
 
 
@@ -194,6 +301,7 @@ export default class Engine {
 
 
     }
+
 
 
 }

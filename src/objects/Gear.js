@@ -1,3 +1,20 @@
+/**
+ * ===========================================================
+ * THE INFINITE ENGINE
+ *
+ * Gear.js
+ *
+ * Mechanical gear component.
+ *
+ * Each gear has:
+ * - position
+ * - rotation speed
+ * - teeth
+ * - mechanical movement
+ * ===========================================================
+ */
+
+
 export default class Gear {
 
 
@@ -5,131 +22,266 @@ export default class Gear {
         p,
         radius,
         speed,
-        offset,
+        angle,
         distance
     ){
 
+
         this.p = p;
+
 
         this.radius = radius;
 
+
         this.speed = speed;
 
-        this.angle = offset;
+
+        this.orbitAngle = angle;
+
 
         this.distance = distance;
 
-        this.orbitAngle = offset;
+
 
         this.rotation = 0;
 
 
+
         this.teeth = Math.floor(
-            radius / 3
+
+            radius / 4
+
         );
 
+
+
     }
+
+
 
 
 
     update(){
 
-        this.orbitAngle += this.speed * 0.02;
 
-        this.rotation += this.speed;
+        // Orbit movement
+
+        this.orbitAngle +=
+            this.speed * 0.002;
+
+
+
+
+        // Actual gear rotation
+
+        this.rotation +=
+            this.speed;
+
+
 
     }
 
 
 
-    draw() {
 
-        const p = this.p;
+
+
+
+    draw(){
+
+
+        const p =
+            this.p;
+
 
 
         p.push();
 
 
-        // move around engine center
-
-        const x =
-            Math.cos(this.orbitAngle)
-            *
-            this.distance;
 
 
-        const y =
-            Math.sin(this.orbitAngle)
-            *
-            this.distance;
+        // Move to gear position
+
+        p.rotate(
+            this.orbitAngle
+        );
+
 
 
         p.translate(
-            x,
-            y
+
+            this.distance,
+
+            0
+
         );
 
 
-        // rotate the gear itself
+
+
+
+        // Rotate gear itself
 
         p.rotate(
+
             this.rotation
+
         );
+
+
+
+
+
+
+        // METAL BODY
 
 
         p.noFill();
 
 
-        p.stroke(180);
+        p.stroke(
+            180,
+            200,
+            220
+        );
 
 
         p.strokeWeight(3);
 
 
-        // gear body
+
 
         p.circle(
+
             0,
+
             0,
+
             this.radius
+
         );
 
 
-        // teeth
 
-        for (
+
+
+
+
+        // INNER CORE HOLE
+
+
+        p.strokeWeight(2);
+
+
+        p.circle(
+
+            0,
+
+            0,
+
+            this.radius * 0.35
+
+        );
+
+
+
+
+
+
+
+        // TEETH
+
+
+        for(
             let i = 0;
             i < this.teeth;
             i++
-        ) {
+        ){
+
+
 
             const angle =
-                (Math.PI * 2 / this.teeth)
-                * i;
+                (
+                    Math.PI * 2
+                    /
+                    this.teeth
+                )
+                *
+                i;
 
 
-            const toothX =
+
+
+
+            const inner =
+                this.radius * 0.5;
+
+
+
+
+            const outer =
+                this.radius * 0.65;
+
+
+
+
+
+            const x1 =
                 Math.cos(angle)
                 *
-                this.radius / 2;
+                inner;
 
 
-            const toothY =
+
+            const y1 =
                 Math.sin(angle)
                 *
-                this.radius / 2;
+                inner;
+
+
+
+
+            const x2 =
+                Math.cos(angle)
+                *
+                outer;
+
+
+
+            const y2 =
+                Math.sin(angle)
+                *
+                outer;
+
+
+
 
 
             p.line(
-                toothX,
-                toothY,
-                toothX * 1.3,
-                toothY * 1.3
+
+                x1,
+
+                y1,
+
+                x2,
+
+                y2
+
             );
+
+
 
         }
 
 
+
+
+
+
         p.pop();
 
-    }}
+
+    }
+
+
+}
